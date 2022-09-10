@@ -4,11 +4,14 @@ import {
   EditorView,
   lineNumbers,
   highlightActiveLine,
-  highlightActiveLineGutter,
+  highlightActiveLineGutter, keymap,
 } from "@codemirror/view";
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
-import { syntaxHighlighting, HighlightStyle } from "@codemirror/language";
+import {HighlightStyle, indentUnit, syntaxHighlighting} from "@codemirror/language";
+import {indentWithTab} from "@codemirror/commands"
+import { languages } from '@codemirror/language-data'
 import { tags } from "@lezer/highlight";
+import {customHighlighting} from "./codemirror/extensions/syntax_highlighting";
 
 const markdownHighlighting = HighlightStyle.define([
   { tag: tags.heading1, fontSize: "1.6em", fontWeight: "bold" },
@@ -24,7 +27,8 @@ const markdownHighlighting = HighlightStyle.define([
   },
 ]);
 
-function useCodemirror({ initialDoc, setDoc }) {
+
+function useCodemirror({ initialDoc, setDoc, plugins }) {
   const ref = useRef(null);
   const [view, setView] = useState(null);
 
@@ -33,20 +37,26 @@ function useCodemirror({ initialDoc, setDoc }) {
     const startState = EditorState.create({
       doc: initialDoc,
       contentHeight: "100%",
+
       extensions: [
+          keymap.of([indentWithTab]),
         lineNumbers(),
         highlightActiveLine(),
         highlightActiveLineGutter(),
         markdown({
           base: markdownLanguage, //Support GFM
+          codeLanguages: languages
         }),
-        syntaxHighlighting(markdownHighlighting),
+        syntaxHighlighting(customHighlighting()),
+        //syntaxHighlighting(markdownHighlighting),
+          indentUnit.of("    "),
+          ...plugins,
         EditorView.lineWrapping,
-        EditorView.updateListener.of((update) => {
-          if (update.docChanged) {
-            setDoc(update.state.doc.toString());
-          }
-        }),
+        // EditorView.updateListener.of((update) => {
+        //   if (update.docChanged) {
+        //     //setDoc(update.state.doc.toString());
+        //   }
+        // }),
       ],
     });
 

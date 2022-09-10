@@ -10,11 +10,27 @@ import "github-markdown-css/github-markdown-light.css";
 import remarkMath from "remark-math";
 import rehypeMathJaxSvg from "rehype-mathjax";
 
+import * as sdb from 'sharedb/lib/client'
+import * as json1 from 'ot-json1'
+import {Connection} from "sharedb/lib/client";
+import ReconnectingWebSocket from "reconnecting-websocket";
+import {createJSON1SyncPlugin} from "./codemirror/ShareDBPlugin";
+
+sdb.types.register(json1.type);
+
+const socket = new ReconnectingWebSocket("ws://127.0.0.1:8080")
+
+const conn = new Connection(socket);
+
+const doc = conn.get("examples", "textarea");
+
+const plugin = createJSON1SyncPlugin(doc, ["content"])
+
 let treeData;
 
 function App() {
-  const [doc, setDoc] = useState("# Hello byome");
-  const [editorRef, editorView] = useCodemirror({ initialDoc: doc, setDoc });
+  const [doc, setDoc] = useState("");
+  const [editorRef, editorView] = useCodemirror({ initialDoc: doc, setDoc, plugins: [plugin] });
   const mouseIsOn = useRef(null);
 
   const defaultPlugin = () => (tree) => {
