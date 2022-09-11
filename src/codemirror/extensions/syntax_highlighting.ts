@@ -1,6 +1,39 @@
 import { HighlightStyle } from '@codemirror/language'
 import {tags} from "@lezer/highlight";
 
+export type HighlightColor = string
+
+export type MarkdownHighlightColors = {
+  atom: HighlightColor
+  meta: HighlightColor
+  processingInstruction: HighlightColor
+  comment: HighlightColor
+  name: HighlightColor
+  labelName: HighlightColor
+  propertyName: HighlightColor
+  variableName: HighlightColor
+  definition: HighlightColor
+  local: HighlightColor
+  special: HighlightColor
+  heading: HighlightColor
+  heading1: HighlightColor
+  heading2: HighlightColor
+  heading3: HighlightColor
+  heading4: HighlightColor
+  heading5: HighlightColor
+  heading6: HighlightColor
+  keyword: HighlightColor
+  number: HighlightColor
+  operator: HighlightColor
+  punctuation: HighlightColor
+  link: HighlightColor
+  url: HighlightColor
+  string: HighlightColor
+  specialString: HighlightColor
+  emphasis: HighlightColor
+  strong: HighlightColor
+}
+
 export const customHighlighting = (): HighlightStyle => HighlightStyle.define([
   // ordered by lowest to highest precedence
   {
@@ -140,5 +173,5 @@ export const customHighlighting = (): HighlightStyle => HighlightStyle.define([
     tag: tags.strong,
     color: 'var(--hybrid-mde-strong, inherit)',
     fontWeight: 'bold',
-  },
+  }
 ])
