@@ -25,7 +25,9 @@ export const createJSON1SyncPlugin = (doc: Doc, path: Path) => {
                     //     }
                     // ))
                     this.performLockedOp(() => {
-                        this.view.dispatch({changes: {from: 0, insert: doc.data.content}})
+                        //this.view.dispatch([{changes}])
+                        const length = this.view.state.doc.length;
+                        this.view.dispatch({changes: {from: 0, to: length, insert: doc.data.content}})
                     })
 
                     doc.on('op', this.handleOp)
