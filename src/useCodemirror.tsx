@@ -11,6 +11,8 @@ import {HighlightStyle, indentUnit, syntaxHighlighting} from "@codemirror/langua
 import {indentWithTab} from "@codemirror/commands"
 import {languages} from '@codemirror/language-data'
 import {getTheme, Theme} from "./codemirror/extensions/theme";
+import { colorPicker } from "./codemirror/extensions/color-picker"
+import { hyperLink } from '@uiw/codemirror-extensions-hyper-link';
 
 
 export type CodeMirrorProps = {
@@ -67,6 +69,8 @@ function useCodemirror(props: CodeMirrorProps) {
         //         //setDoc(update.state.doc.toString());
         //     }
         // }),
+        colorPicker,
+        hyperLink,
     ]
 
     if(view) {
@@ -74,7 +78,9 @@ function useCodemirror(props: CodeMirrorProps) {
     }
 
     useEffect(() => {
+        console.log("useEffect called")
         if (!ref.current) return;
+        console.log("Creating new editor view")
         const startState = EditorState.create({
             doc: props.initialDoc,
             //contentHeight: "100%",

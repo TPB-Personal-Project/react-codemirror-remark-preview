@@ -16,6 +16,15 @@ import {Connection} from "sharedb/lib/client";
 import ReconnectingWebSocket from "reconnecting-websocket";
 import {createJSON1SyncPlugin} from "./codemirror/ShareDBPlugin";
 import Select from "react-select";
+import ReactCodeMirror from "@uiw/react-codemirror";
+import {EditorView, highlightActiveLine, highlightActiveLineGutter, keymap, lineNumbers} from "@codemirror/view";
+import {indentWithTab} from "@codemirror/commands";
+import {markdown, markdownLanguage} from "@codemirror/lang-markdown";
+import {languages} from "@codemirror/language-data";
+import {getTheme} from "./codemirror/extensions/theme";
+import {indentUnit} from "@codemirror/language";
+import {colorPicker} from "./codemirror/extensions/color-picker";
+import {hyperLink} from "@uiw/codemirror-extensions-hyper-link";
 
 sdb.types.register(json1.type);
 
@@ -25,17 +34,34 @@ const conn = new Connection(socket);
 
 const doc = conn.get("examples", "textarea");
 
-const plugin = createJSON1SyncPlugin(doc, ["content"])
+const syncPlugin = createJSON1SyncPlugin(doc, ["content"])
+
+
+const extensions = [
+    keymap.of([indentWithTab]),
+    lineNumbers(),
+    highlightActiveLine(),
+    highlightActiveLineGutter(),
+    markdown({
+        base: markdownLanguage, //Support GFM
+        codeLanguages: languages
+    }),
+    indentUnit.of("    "),
+    EditorView.lineWrapping,
+    syncPlugin,
+    colorPicker,
+    hyperLink,
+]
 
 let treeData;
 
 function App() {
     const [doc, setDoc] = useState("");
-    const [theme, setTheme] = useState("githubDark")
+    const [theme, setTheme] = useState(getTheme("githubDark"))
     const [editorRef, editorView, setConfig] = useCodemirror({
         initialDoc: doc,
         setDoc,
-        plugins: [plugin],
+        plugins: [syncPlugin],
         live: {theme}
     });
     const mouseIsOn = useRef(null);
@@ -146,8 +172,7 @@ function App() {
     function changeTheme(value) {
         console.log("Changing theme");
         const theme = value.value;
-        setTheme(theme)
-        setConfig({theme})
+        setTheme(getTheme(theme));
     }
 
     return (
@@ -164,12 +189,8 @@ function App() {
             }/>
             //
             <div id="editor-wrapper">
-                <div
-                    id="markdown"
-                    ref={editorRef}
-                    onScroll={handleMdScroll}
-                    onMouseEnter={() => (mouseIsOn.current = "markdown")}
-                ></div>
+
+                <ReactCodeMirror extensions={extensions} theme={theme}/>
                 <div
                     id="preview"
                     className="markdown-body"
