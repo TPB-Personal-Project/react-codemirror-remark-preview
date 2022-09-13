@@ -95,11 +95,12 @@ function App() {
             ]
             }/>
 
-            <div id="editor-wrapper" >
 
-                <MarkdownEditor reExtensions={extensions} theme={theme} renderPreview={(props) => <IncrementalPreview source={props.source}/> } />
+                <MarkdownEditor reExtensions={extensions} theme={theme}
+                                renderPreview={(props) => <IncrementalPreview source={props.source}/>}
+                                minWidth={"100%"}
+                />
 
-            </div>
 
 
 
